@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Baron.Entity
 {
-    public class BUser : IdentityUser
+    public class BUser : IdentityUser<Guid>
     {
         
     }
