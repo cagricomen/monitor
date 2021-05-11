@@ -4,17 +4,19 @@ import Forbidden from 'components/root/forbidden'
 
 
 export const routes =
-  [
-    { name: 'monitoring-list', path: '/monitoring/list', component: MonitoringList, display: 'Monitoring', icon: 'chart-line' },
-    {
-      divider: true,
-      path: ''
-    },
-    { name: 'monitoring-save', path: '/monitoring/save', component: MonitoringSave, display: 'New Monitoring', icon: 'plus' },
-    {
-      divider: true,
-      path: ''
-    },
-    { name: 'acccount-subscription', path: '/Subscription',  display: 'Subscription', icon: 'credit-card' },
-    {name: 'forbidden', path: '/forbidden', hidden: true, component: Forbidden}
-  ]
+[
+  { name: 'monitoring-list', path: '/monitoring/list', component: MonitoringList, display: 'Monitoring', icon: 'chart-line' },
+  {
+    divider: true,
+    path: ''
+  },
+  { name: 'monitoring-save', path: '/monitoring/save', component: MonitoringSave, display: 'New Monitoring', icon: 'plus' },
+
+  {
+    divider: true,
+    path: ''
+  },
+  { name: 'acccount-view', path: '/Identity/Account/Manage', display: 'Account', icon: 'user-tie' },
+  { name: 'acccount-subscription', path: '/Subscription', display: 'Subscription', icon: 'credit-card' },
+  { name: 'forbidden', path: '/forbidden', hidden: true, component: Forbidden }
+]
