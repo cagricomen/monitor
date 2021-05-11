@@ -7,12 +7,23 @@ import App from 'components/root/app-root'
 import { FontAwesomeIcon } from './icons'
 import PageHead from 'components/shared/page-head';
 import Notifications from 'vue-notification';
+import VueContentPlaceholders from "vue-content-placeholders"
+import VueApexCharts from 'vue-apexcharts'
+import BIText from 'components/input/text';
+
+Vue.use(VueApexCharts)
+
+
+Vue.use(VueContentPlaceholders)
 
 Vue.use(Notifications);
 
 // Registration of global components
+Vue.component('apexchart', VueApexCharts)
 Vue.component('icon', FontAwesomeIcon);
 Vue.component('page-head', PageHead);
+Vue.component('bi-text', BIText);
+
 
 Vue.prototype.$http = axios
 

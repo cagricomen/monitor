@@ -4,24 +4,27 @@
   <div>
     <page-head icon="chart-line" title="All Monitorings" />
     <div class="row">
-      <div class="col-md-12">
-        <div class="card mb-3 col-md-3" v-for="(item,index) in monitorings" :key="index">
-          <img
-            class="card-img-top"
-            src="https://via.placeholder.com/512"
-
-            alt="Card image cap"
-          />
+      <div class="col-md-3" v-for="(item, index) in monitorings" :key="index">
+        <div class="card mr-4 mb-4">
+          <apexchart
+            type="area"
+            :options="item.chart"
+            :series="item.chart.series"
+            class="mt-4 ml-2 mr-2"
+          ></apexchart>
           <div class="card-body">
-            <h4 class="card-title">{{item.name}} </h4>
-            <p class="card-text">
-              This is a wider card with supporting text below as a natural
-              lead-in to additional content. This content is a little bit
-              longer.
-            </p>
-            <p class="card-text">
-              <small class="text-muted">Last updated 3 mins ago</small>
-            </p>
+            <h4 class="card-title  justify-content-between align-items-center">
+              {{ item.name }}
+              <router-link
+                :to="{
+                  name: 'monitoring-view',
+                  params: { id: item.monitorId }
+                }"
+                class="btn btn-sm btn-info"
+              >
+                View Dashboard
+              </router-link>
+            </h4>
           </div>
         </div>
       </div>
@@ -30,5 +33,79 @@
 </template>
 
 <script>
+import service from "service/monitoring";
 
+export default {
+  data() {
+    return {
+      monitorings: []
+    };
+  },
+  async mounted() {
+    var result = await service.list();
+    if (result.data && result.data.length) {
+      result.data.map(item => {
+        item.chart = {
+          chart: {
+            type: "area",
+            height: 160,
+            sparkline: {
+              enabled: true
+            }
+          },
+          stroke: {
+            curve: "straight"
+          },
+          fill: {
+            opacity: 0.3
+          },
+          series: [
+            {
+              data: this.randomize()
+            }
+          ],
+          yaxis: {
+            min: 0
+          },
+          colors: ["#DCE6EC"],
+          title: {
+            text: "99.34%",
+            offsetX: 0,
+            style: {
+              fontSize: "20pt",
+              cssClass: "apexcharts-yaxis-title"
+            }
+          },
+          subtitle: {
+            text: "Uptime",
+            offsetX: 0,
+            style: {
+              fontSize: "14px",
+              cssClass: "apexcharts-yaxis-title"
+            }
+          }
+        };
+        this.monitorings.push(item);
+      });
+    }
+  },
+  methods: {
+    randomize() {
+      let arg = [25, 66, 41, 89, 63, 25, 44, 12, 36, 9, 54];
+      var array = arg.slice();
+      var currentIndex = array.length,
+        temporaryValue,
+        randomIndex;
+
+      while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+  }
+};
 </script>
