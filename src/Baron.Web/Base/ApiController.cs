@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Baron.Entity;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,16 @@ namespace Baron.Web
     {
         private UserManager<BUser> _userManager;
         public UserManager<BUser> UserManager => _userManager ?? (UserManager<BUser>)HttpContext?.RequestServices.GetService(typeof(UserManager<BUser>));
+        public Guid UserId
+        {
+            get
+            {
+                var userId = UserManager.GetUserId(User);
+                return Guid.Parse(userId);
+            }
+        }
+
+
         public IActionResult Success(string message = default(string), object data = default(object), int code = 200)
         {
             return Ok(
@@ -39,6 +50,8 @@ namespace Baron.Web
                 return Unauthorized();
             if (rv.Code == 403)
                 return Forbid();
+            if (rv.Code == 404)
+                return NotFound(rv);
             return BadRequest(rv);
         }
     }
