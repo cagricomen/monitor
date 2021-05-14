@@ -1,6 +1,6 @@
 using System;
 
-namespace Baron.Web.Models
+namespace Baron.Web
 {
     public class BMMonitorSave
     {
