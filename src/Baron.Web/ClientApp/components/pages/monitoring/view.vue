@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div v-if="!item">
+    <div v-if="item">
       <content-placeholders>
         <content-placeholders-text :lines="3" />
       </content-placeholders>
     </div>
-    <div v-if="item">
-      <page-head title="Dashboard" :prefix="item.name" />
+    <div v-if="!item">
+      <page-head title="Dashboard" prefix="cagricomen" icon="chart-line"/>
       <div class="row">
         <div class="col-sm-6 col-xl-3">
           <div class="card mb-4">
@@ -134,6 +134,7 @@
 
 <script>
 import service from "service/monitoring";
+
 export default {
   data() {
     return {
@@ -145,6 +146,7 @@ export default {
     var result = await service.get(this.$route.params.id);
     if (result.success) {
       this.item = result.data;
+      console.log(item);
     }
   }
 };

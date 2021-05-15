@@ -10,7 +10,7 @@ const MonitoringService = {
     }
   },
   async get(id) {
-    var result = await http.get("/api/monitoring/" +id);
+    var result = await http.get("/api/monitoring/" + id);
     if (result.status === 200) {
       return result.data;
     } else {

@@ -13,17 +13,30 @@
             class="mt-4 ml-2 mr-2"
           ></apexchart>
           <div class="card-body">
-            <h4 class="card-title  justify-content-between align-items-center">
+            <h4
+              class="card-title d-flex justify-content-between align-items-center"
+            >
               {{ item.name }}
-              <router-link
-                :to="{
-                  name: 'monitoring-view',
-                  params: { id: item.monitorId }
-                }"
-                class="btn btn-sm btn-info"
-              >
-                View Dashboard
-              </router-link>
+              <div class="btn-group">
+                <router-link
+                  :to="{
+                    name: 'monitoring-view',
+                    params: { id: item.monitorId }
+                  }"
+                  class="btn btn-sm btn-secondary mr-2"
+                >
+                  View Dashboard
+                </router-link>
+                <router-link
+                  :to="{
+                    name: 'monitoring-save',
+                    params: { id: item.monitorId }
+                  }"
+                  class="btn btn-sm btn-primary "
+                >
+                  Edit
+                </router-link>
+              </div>
             </h4>
           </div>
         </div>

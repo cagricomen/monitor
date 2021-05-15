@@ -11,7 +11,7 @@ export const routes =
       divider: true,
       path: ''
     },
-    { name: 'monitoring-save', path: '/monitoring/save', component: MonitoringSave, display: 'New Monitoring', icon: 'plus' },
+    { name: 'monitoring-save', path: '/monitoring/save/:id?', component: MonitoringSave, display: 'New Monitoring', icon: 'plus' },
     { name: 'monitoring-view', path: '/monitoring/view/:id', component: MonitoringView, display: 'View Monitoring', hidden: true },
     {
       divider: true,

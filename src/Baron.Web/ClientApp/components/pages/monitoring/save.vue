@@ -1,20 +1,38 @@
 <template>
   <div>
-    <page-head icon="plus" title="New Monitoring" />
-
-    <bi-text title="Project Name" placeholder="Type your project name" v-model="model.name" />
-    <bi-text title="Project Url" placeholder="Type your website url for test" v-model="model.url" />
-    <button @click="save" class="btn btn-primary">
-      Save
-    </button>
+    <div v-if="loading">
+      <content-placeholders>
+        <content-placeholders-text :lines="3" />
+      </content-placeholders>
+    </div>
+    <div v-if="!loading">
+      <page-head icon="plus" title="New Monitoring" />
+      <div>
+        <bi-text
+          title="Project Name"
+          placeholder="Type your project name"
+          v-model="model.name"
+        />
+        <bi-text
+          title="Project Url"
+          placeholder="Type your website url for test"
+          v-model="model.url"
+        />
+        <button @click="save" class="btn btn-success">
+          <icon icon="plus" />Save
+        </button>
+      </div>
+    </div>
   </div>
 </template>
+
 <script>
 import service from "service/monitoring";
-import router from '@/router'
+import router from "@/router";
 export default {
   data() {
     return {
+      loading: true,
       model: {
         name: "",
         url: ""
@@ -22,21 +40,26 @@ export default {
     };
   },
   async mounted() {
-    if(this.$route.params.id){
+    if (this.$route.params.id) {
       let result = await service.get(this.$route.params.id);
-      if(result.success){
+      this.loading = false;
+      if (result.success) {
+        console.log(result);
         this.model.name = result.data.name;
         this.model.url = result.data.url;
       }
     }
+    else{
+      this.loading = false
+    }
   },
   methods: {
     async save() {
-       if(this.$route.params.id) {
-         this.model.id = this.$route.params.id;
-       }
+      if(this.$route.params.id){
+        this.model.id = this.$route.params.id;
+      }
       let result = await service.save(this.model);
-      if(result.success && result.data && result.data.id){
+      if (result.success && result.data && result.data.id) {
         router.push({
           name: "monitoring-list"
         });
@@ -45,4 +68,3 @@ export default {
   }
 };
 </script>
-

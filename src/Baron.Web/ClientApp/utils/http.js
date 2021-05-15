@@ -7,7 +7,7 @@ export const http = axios.create({
     "Content-Type": "application/json",
     "X-Requested-With": "XMLHttpRequest",
     "X-Application-Name": "vue",
-    "Accept-Type" : "application/json"
+    "Accept-Type": "application/json"
   }
 });
 
@@ -27,14 +27,14 @@ http.interceptors.response.use(
     const statusCode = error.response.status;
     if (statusCode === 401) {
       window.location.href = "/Identity/Account/Login?ReturnUrl=" + encodeURIComponent(window.location.pathname);
-      return new Promise(() => {});
+      return new Promise(() => { });
     }
 
     if (statusCode === 403) {
       router.push({
         name: "forbidden"
       });
-      return new Promise(() => {});
+      return new Promise(() => { });
     }
     const response = error.response;
     if (!response.data.success && response.data.message) {
