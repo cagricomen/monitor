@@ -10,6 +10,7 @@ import Notifications from 'vue-notification';
 import VueContentPlaceholders from "vue-content-placeholders"
 import VueApexCharts from 'vue-apexcharts'
 import BIText from 'components/input/text';
+import BVMonitorStatus from 'components/shared/monitor-status';
 
 Vue.use(VueApexCharts)
 
@@ -23,6 +24,7 @@ Vue.component('apexchart', VueApexCharts)
 Vue.component('icon', FontAwesomeIcon);
 Vue.component('page-head', PageHead);
 Vue.component('bi-text', BIText);
+Vue.component('monitor-status', BVMonitorStatus);
 
 
 Vue.prototype.$http = axios

@@ -25,7 +25,7 @@ namespace Baron.Web.Controllers
             var downTime = 0.00;
             var downTimePercent = 0.00;
             var upTimes = new List<double>();
-
+            var stepStatus = BMonitorStepStatusTypes.Unknown;
 
             var url = string.Empty;
             var monitorStepRequest = await Db.MonitorSteps.FirstOrDefaultAsync(x => x.MonitorId == monitor.MonitorId && x.Type == BMonitorStepTypes.Request);
@@ -40,6 +40,7 @@ namespace Baron.Web.Controllers
                 var logs = await Db.MonitorStepLogs
                                 .Where(x => x.MonitorStepId == monitorStepRequest.MonitorStepId && x.StartDate >= week)
                                 .OrderByDescending(x => x.StartDate)
+                                .Take(50)
                                 .ToListAsync();
                 if (logs.Any(x => x.Status == BMonitorStepStatusTypes.Success))
                 {
@@ -54,9 +55,26 @@ namespace Baron.Web.Controllers
 
                     if (log.Status == BMonitorStepStatusTypes.Fail)
                         downTime += log.Interval;
+
+                    var currentDowntimePercent = (downTime / totalMonitoredTime) * 100;
+                    var currentUptimePercent = 100 - currentDowntimePercent;
+
+                    upTimes.Add(double.IsNaN(currentUptimePercent) ? 0 : currentUptimePercent);
                 }
-                downTimePercent = 100 - (downTime / totalMonitoredTime) * 100;
+
+                var lastlog = logs.LastOrDefault();
+                if(lastlog != null)
+                    stepStatus = lastlog.Status;
+
+                downTimePercent = (downTime / totalMonitoredTime) * 100;
+                upTime = 100 - downTimePercent;
             }
+
+            if (double.IsNaN(upTime))
+                upTime = 0;
+
+
+
             return new
             {
                 monitor.MonitorId,
@@ -73,7 +91,9 @@ namespace Baron.Web.Controllers
                 downTimePercent,
                 loadTime,
                 loadTimes,
-                totalMonitoredTime
+                totalMonitoredTime,
+                stepStatus,
+                stepStatusText = $"{stepStatus}"
             };
         }
         [HttpGet]
@@ -100,7 +120,7 @@ namespace Baron.Web.Controllers
                 clientList.Add(await GetMonitorClientModel(item));
             }
 
-            return Success(null, list);
+            return Success(null, clientList);
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] BMMonitorSave value)

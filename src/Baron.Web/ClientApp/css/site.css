@@ -1,1 +1,9 @@
 /* This file should be reviewed. It's not optimal, but it works for now. */
+.monitor-card {
+    width: 340px;
+}
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

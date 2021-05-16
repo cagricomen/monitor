@@ -35,7 +35,7 @@ namespace Baron.Web
                 {
                     var db = scope.ServiceProvider.GetRequiredService<BContext>();
                     var steps = await db.MonitorSteps
-                                    .Where(x => x.Type == BMonitorStepTypes.Request && x.Status != BMonitorStepStatusTypes.Processing)
+                                    .Where(x => x.Type == BMonitorStepTypes.Request && x.Status != BMonitorStepStatusTypes.Processing && x.LastCheckDate.AddSeconds(x.Interval) > DateTime.UtcNow)
                                     .OrderBy(x => x.LastCheckDate)
                                     .Take(20)
                                     .ToListAsync();
@@ -69,6 +69,11 @@ namespace Baron.Web
                                 {
                                     log.Status = BMonitorStepStatusTypes.Fail;
                                 }
+                            }
+                            catch (HttpRequestException rex)
+                            {
+                                log.Log = rex.Message;
+                                log.Status = BMonitorStepStatusTypes.Fail;
                             }
                             catch (Exception ex)
                             {
