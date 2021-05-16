@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Baron.Entity;
@@ -12,8 +13,71 @@ namespace Baron.Web.Controllers
     [Authorize]
     public class MonitoringController : ApiController
     {
+        [NonAction]
+        private async Task<object> GetMonitorClientModel(BMonitor monitor)
+        {
+
+            var loadTimes = new List<double>();
+            var loadTime = 0.00;
+
+            var totalMonitoredTime = 0;
+            var upTime = 0.00;
+            var downTime = 0.00;
+            var downTimePercent = 0.00;
+            var upTimes = new List<double>();
+
+
+            var url = string.Empty;
+            var monitorStepRequest = await Db.MonitorSteps.FirstOrDefaultAsync(x => x.MonitorId == monitor.MonitorId && x.Type == BMonitorStepTypes.Request);
+            if (monitorStepRequest != null)
+            {
+                var requestSettings = monitorStepRequest.SettingsAsRequest();
+                if (requestSettings != null)
+                {
+                    url = requestSettings.Url;
+                }
+                var week = DateTime.UtcNow.AddDays(-14);
+                var logs = await Db.MonitorStepLogs
+                                .Where(x => x.MonitorStepId == monitorStepRequest.MonitorStepId && x.StartDate >= week)
+                                .OrderByDescending(x => x.StartDate)
+                                .ToListAsync();
+                if (logs.Any(x => x.Status == BMonitorStepStatusTypes.Success))
+                {
+                    loadTime = logs.Where(x => x.Status == BMonitorStepStatusTypes.Success)
+                                   .Average(x => x.EndDate.Subtract(x.StartDate).TotalMilliseconds);
+                }
+                foreach (var log in logs)
+                {
+                    totalMonitoredTime += log.Interval;
+                    if (log.Status == BMonitorStepStatusTypes.Success)
+                        loadTimes.Add(log.EndDate.Subtract(log.StartDate).TotalMilliseconds);
+
+                    if (log.Status == BMonitorStepStatusTypes.Fail)
+                        downTime += log.Interval;
+                }
+                downTimePercent = 100 - (downTime / totalMonitoredTime) * 100;
+            }
+            return new
+            {
+                monitor.MonitorId,
+                monitor.CreatedDate,
+                monitor.LastCheckDate,
+                monitor.MonitorStatus,
+                monitor.Name,
+                monitor.TestStatus,
+                monitor.UpdatedDate,
+                url,
+                upTimes,
+                upTime,
+                downTime,
+                downTimePercent,
+                loadTime,
+                loadTimes,
+                totalMonitoredTime
+            };
+        }
         [HttpGet]
-        public async Task<IActionResult> Get([FromRoute]Guid? id)
+        public async Task<IActionResult> Get([FromRoute] Guid? id)
         {
             if (id.HasValue)
             {
@@ -27,30 +91,15 @@ namespace Baron.Web.Controllers
                     return Error("Monitor not found", code: 404);
                 }
 
-                var url = string.Empty;
-                var monitorStepRequest = await Db.MonitorSteps.FirstOrDefaultAsync(x => x.MonitorId == monitor.MonitorId && x.Type == BMonitorStepTypes.Request);
-                if (monitorStepRequest != null)
-                {
-                    var requestSettings = monitorStepRequest.SettingsAsRequest();
-                    if (requestSettings != null)
-                    {
-                        url = requestSettings.Url;
-                    }
-                }
-                return Success(data: new
-                {
-                    monitor.MonitorId,
-                    monitor.CreatedDate,
-                    monitor.LastCheckDate,
-                    monitor.MonitorStatus,
-                    monitor.Name,
-                    monitor.TestStatus,
-                    monitor.UpTime,
-                    monitor.UpdatedDate,
-                    Url = url
-                });
+                return Success(data: await GetMonitorClientModel(monitor));
             }
             var list = await Db.Monitors.Where(x => x.UserId == UserId).ToListAsync();
+            var clientList = new List<object>();
+            foreach (var item in list)
+            {
+                clientList.Add(await GetMonitorClientModel(item));
+            }
+
             return Success(null, list);
         }
         [HttpPost]
@@ -61,8 +110,8 @@ namespace Baron.Web.Controllers
             {
                 return Error("Name is required.");
             }
-            var monitorCheck = await Db.Monitors.AnyAsync(x=>x.Name.Equals(value.Name) && x.UserId == UserId);
-            if(monitorCheck)
+            var monitorCheck = await Db.Monitors.AnyAsync(x => x.Name.Equals(value.Name) && x.UserId == UserId);
+            if (monitorCheck)
             {
                 return Error("project name is already.choose different name");
             }
@@ -106,7 +155,8 @@ namespace Baron.Web.Controllers
                     MonitorStepId = Guid.NewGuid(),
                     Type = BMonitorStepTypes.Request,
                     MonitorId = data.MonitorId,
-                    Settings = JsonConvert.SerializeObject(monitorStepData)
+                    Settings = JsonConvert.SerializeObject(monitorStepData),
+                    Interval = 10
                 };
                 Db.MonitorSteps.Add(step);
             }

@@ -3,7 +3,7 @@
   <!-- Layout sidenav -->
   <div
     id="layout-sidenav"
-    class="sidenav sidenav-vertical layout-sidenav bg-sidenav-theme"
+    class="layout-sidenav sidenav sidenav-vertical bg-info-darker sidenav-dark"
   >
     <ul class="sidenav-inner py-1">
       <template v-for="(route, index) in routes">

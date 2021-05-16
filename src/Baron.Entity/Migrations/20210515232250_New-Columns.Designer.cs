@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Baron.Entity.Migrations
 {
     [DbContext(typeof(BContext))]
-    [Migration("20210510215223_Create-Identity-Tables")]
-    partial class CreateIdentityTables
+    [Migration("20210515232250_New-Columns")]
+    partial class NewColumns
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,80 @@ namespace Baron.Entity.Migrations
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("Baron.Entity.BMonitor", b =>
+                {
+                    b.Property<Guid>("MonitorId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<DateTime>("LastCheckDate");
+
+                    b.Property<int>("LoadTime");
+
+                    b.Property<short>("MonitorStatus");
+
+                    b.Property<int>("Monitortime");
+
+                    b.Property<string>("Name");
+
+                    b.Property<short>("TestStatus");
+
+                    b.Property<decimal>("UpTime");
+
+                    b.Property<DateTime>("UpdatedDate");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("MonitorId");
+
+                    b.ToTable("Monitor");
+                });
+
+            modelBuilder.Entity("Baron.Entity.BMonitorStep", b =>
+                {
+                    b.Property<Guid>("MonitorStepId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Interval");
+
+                    b.Property<Guid>("MonitorId");
+
+                    b.Property<string>("Settings");
+
+                    b.Property<short>("Status");
+
+                    b.Property<short>("Type");
+
+                    b.HasKey("MonitorStepId");
+
+                    b.ToTable("MonitorStep");
+                });
+
+            modelBuilder.Entity("Baron.Entity.BMonitorStepLog", b =>
+                {
+                    b.Property<Guid>("MonitorStepLogId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("EndDate");
+
+                    b.Property<int>("Interval");
+
+                    b.Property<string>("Log");
+
+                    b.Property<Guid>("MonitorId");
+
+                    b.Property<Guid>("MonitorStepId");
+
+                    b.Property<DateTime>("StartDate");
+
+                    b.Property<short>("Status");
+
+                    b.HasKey("MonitorStepLogId");
+
+                    b.ToTable("MonitorStepLog");
+                });
 
             modelBuilder.Entity("Baron.Entity.BUser", b =>
                 {

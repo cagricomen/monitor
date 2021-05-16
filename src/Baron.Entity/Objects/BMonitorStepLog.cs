@@ -15,10 +15,7 @@ namespace Baron.Entity
         public DateTime EndDate { get; set; }
         public BMonitorStepStatusTypes Status { get; set; }
         public string Log { get; set; }
+        public int Interval { get; set; }
     }
-    public enum BMonitorStepStatusTypes : short
-    {
-        Fail = 0,
-        Success = 1
-    }
+   
 }

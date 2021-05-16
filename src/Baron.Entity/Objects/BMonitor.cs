@@ -19,18 +19,20 @@ namespace Baron.Entity
         public DateTime LastCheckDate { get; set; }
         public decimal UpTime { get; set; }
         public int LoadTime { get; set; }
-        public short Monitortime { get; set; }
+        public int Monitortime { get; set; }
     }
     public enum BMonitorStatusTypes : short
     {
-        Down = 0,
+        Unknown = 0,
         Up = 1,
-        Warning = 2
+        Down = 2,
+        Warning = 3
     }
     public enum BTestStatusTypes : short
     {
-        Fail = 0,
+        Unknown = 0,
         AllPassed = 1,
-        Warning = 2
+        Fail = 2,
+        Warning = 3
     }
 }

@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Baron.Entity.Migrations
 {
     [DbContext(typeof(BContext))]
-    [Migration("20210511201549_Added-New-Tables")]
-    partial class AddedNewTables
+    [Migration("20210516121803_LastCheck-to-monitorstep")]
+    partial class LastChecktomonitorstep
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,7 +34,7 @@ namespace Baron.Entity.Migrations
 
                     b.Property<short>("MonitorStatus");
 
-                    b.Property<short>("Monitortime");
+                    b.Property<int>("Monitortime");
 
                     b.Property<string>("Name");
 
@@ -56,9 +56,15 @@ namespace Baron.Entity.Migrations
                     b.Property<Guid>("MonitorStepId")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Interval");
+
+                    b.Property<DateTime>("LastCheckDate");
+
                     b.Property<Guid>("MonitorId");
 
                     b.Property<string>("Settings");
+
+                    b.Property<short>("Status");
 
                     b.Property<short>("Type");
 
@@ -73,6 +79,8 @@ namespace Baron.Entity.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("EndDate");
+
+                    b.Property<int>("Interval");
 
                     b.Property<string>("Log");
 

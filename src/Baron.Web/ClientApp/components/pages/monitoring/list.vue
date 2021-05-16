@@ -25,14 +25,14 @@
                   }"
                   class="btn btn-sm btn-secondary mr-2"
                 >
-                  View Dashboard
+                  Dashboard
                 </router-link>
                 <router-link
                   :to="{
                     name: 'monitoring-save',
                     params: { id: item.monitorId }
                   }"
-                  class="btn btn-sm btn-primary "
+                  class="btn btn-sm btn-primary d-none "
                 >
                   Edit
                 </router-link>

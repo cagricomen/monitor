@@ -24,7 +24,7 @@ namespace Baron.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BContext>(
-                options => options.UseNpgsql("Server=localhost;Port=5432;Database=Monitoring;User Id=postgres;Password=admin;")
+                options => options.UseNpgsql("Server=localhost;Port=5432;Database=Baron;User Id=postgres;Password=admin;")
             );
 
               services
@@ -68,6 +68,9 @@ namespace Baron.Web
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+
+
+            services.AddHostedService<BBSMonitoring>();
             // Simple example with dependency injection for a data provider.
         }
 
