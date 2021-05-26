@@ -35,7 +35,7 @@ namespace Baron.Web
                 {
                     var db = scope.ServiceProvider.GetRequiredService<BContext>();
                     var steps = await db.MonitorSteps
-                                    .Where(x => x.Type == BMonitorStepTypes.Request && x.Status != BMonitorStepStatusTypes.Processing && x.LastCheckDate.AddSeconds(x.Interval) > DateTime.UtcNow)
+                                    .Where(x => x.Type == BMonitorStepTypes.Request && x.Status != BMonitorStepStatusTypes.Processing &&  DateTime.UtcNow > x.LastCheckDate.AddSeconds(x.Interval))
                                     .OrderBy(x => x.LastCheckDate)
                                     .Take(20)
                                     .ToListAsync();
