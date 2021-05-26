@@ -20,7 +20,7 @@ namespace Baron.Web
             }
         }
 
-
+        [NonAction]
         public IActionResult Success(string message = default(string), object data = default(object), int code = 200)
         {
             return Ok(
@@ -34,6 +34,7 @@ namespace Baron.Web
                 }
             );
         }
+        [NonAction]
         public IActionResult Error(string message = default(string), string internalMessage = default(string), object data = default(object), int code = 400, List<BReturnError> errorMessages = null)
         {
             var rv = new BReturn()
