@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 
 namespace Baron.Web.Controllers
 {
-    [Authorize]
     public class MonitoringController : ApiController
     {
         [NonAction]
@@ -42,6 +41,8 @@ namespace Baron.Web.Controllers
                                 .OrderByDescending(x => x.StartDate)
                                 .Take(50)
                                 .ToListAsync();
+
+                logs = logs.OrderBy(x => x.StartDate).ToList();
                 if (logs.Any(x => x.Status == BMonitorStepStatusTypes.Success))
                 {
                     loadTime = logs.Where(x => x.Status == BMonitorStepStatusTypes.Success)
@@ -63,7 +64,7 @@ namespace Baron.Web.Controllers
                 }
 
                 var lastlog = logs.LastOrDefault();
-                if(lastlog != null)
+                if (lastlog != null)
                     stepStatus = lastlog.Status;
 
                 downTimePercent = (downTime / totalMonitoredTime) * 100;
@@ -72,7 +73,6 @@ namespace Baron.Web.Controllers
 
             if (double.IsNaN(upTime))
                 upTime = 0;
-
 
 
             return new
@@ -96,8 +96,8 @@ namespace Baron.Web.Controllers
                 stepStatusText = $"{stepStatus}"
             };
         }
-        [HttpGet]
-        public async Task<IActionResult> Get([FromRoute] Guid? id)
+        [HttpGet("{id?}")]
+        public async Task<IActionResult> Get([FromRoute]Guid? id)
         {
             if (id.HasValue)
             {

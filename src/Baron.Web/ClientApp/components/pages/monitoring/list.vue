@@ -113,7 +113,7 @@ export default {
         yaxis: {
           min: 0
         },
-        colors: ["#DCE6EC"],
+        colors: ["#00bfff"],
         title: {
           text: title,
           style: {
