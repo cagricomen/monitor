@@ -11,11 +11,15 @@ import VueContentPlaceholders from "vue-content-placeholders"
 import VueApexCharts from 'vue-apexcharts'
 import BIText from 'components/input/text';
 import BVMonitorStatus from 'components/shared/monitor-status';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(VueApexCharts)
-
+Vue.use(BootstrapVue)
 
 Vue.use(VueContentPlaceholders)
+Vue.use(require('vue-moment'));
 
 Vue.use(Notifications);
 
