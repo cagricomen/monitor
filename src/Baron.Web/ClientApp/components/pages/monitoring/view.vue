@@ -1,74 +1,34 @@
 <template>
   <div>
-    <div v-if="item">
+    <div v-if="!item">
       <content-placeholders>
         <content-placeholders-text :lines="3" />
       </content-placeholders>
     </div>
-    <div v-if="!item">
-      <page-head title="Dashboard" prefix="cagricomen" icon="chart-line"/>
+    <div v-if="item">
+      <page-head title="Dashboard" prefix="cagricomen" icon="chart-line" />
       <div class="row">
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-sm-6 col-xl-6">
           <div class="card mb-4">
-            <!----><!---->
-            <div class="card-body">
-              <!----><!---->
-              <div class="d-flex align-items-center">
-                <div class="lnr lnr-cart display-4 text-success"></div>
-                <div class="ml-3">
-                  <div class="text-muted small">Monthly sales</div>
-                  <div class="text-large">2362</div>
-                </div>
-              </div>
-            </div>
+             <apexchart
+                type="area"
+                :options="item.uptimeChart"
+                :series="item.uptimeChart.series"
+                class="m-2 mt-4"
+                height="100"
+              />
             <!----><!---->
           </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-sm-6 col-xl-6">
           <div class="card mb-4">
-            <!----><!---->
-            <div class="card-body">
-              <!----><!---->
-              <div class="d-flex align-items-center">
-                <div class="lnr lnr-earth display-4 text-info"></div>
-                <div class="ml-3">
-                  <div class="text-muted small">Monthly visits</div>
-                  <div class="text-large">687,123</div>
-                </div>
-              </div>
-            </div>
-            <!----><!---->
-          </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-          <div class="card mb-4">
-            <!----><!---->
-            <div class="card-body">
-              <!----><!---->
-              <div class="d-flex align-items-center">
-                <div class="lnr lnr-gift display-4 text-danger"></div>
-                <div class="ml-3">
-                  <div class="text-muted small">Products</div>
-                  <div class="text-large">985</div>
-                </div>
-              </div>
-            </div>
-            <!----><!---->
-          </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-          <div class="card mb-4">
-            <!----><!---->
-            <div class="card-body">
-              <!----><!---->
-              <div class="d-flex align-items-center">
-                <div class="lnr lnr-users display-4 text-warning"></div>
-                <div class="ml-3">
-                  <div class="text-muted small">Users</div>
-                  <div class="text-large">105,652</div>
-                </div>
-              </div>
-            </div>
+            <apexchart
+              type="area"
+              :options="item.loadtimeChart"
+              :series="item.loadtimeChart.series"
+              class="m-2 mt-4"
+              height="100"
+            />
             <!----><!---->
           </div>
         </div>
@@ -88,39 +48,43 @@
               </div>
             </h6>
             <div class="table-responsive">
-              <table class="table card-table">
+              <table class="table card-table" v-if="steps">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Sales</th>
-                    <th>Cancelled</th>
-                    <th>Delivered</th>
+                    <th>...</th>
+                    <th>Type</th>
+                    <th>Last Check Date</th>
+                    <th>Status</th>
+                    <th>Interval</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>02/08/2018</td>
-                    <td>12</td>
-                    <td>1</td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td>02/07/2018</td>
-                    <td>16</td>
-                    <td>2</td>
-                    <td>8</td>
-                  </tr>
-                  <tr>
-                    <td>02/06/2018</td>
-                    <td>5</td>
-                    <td>0</td>
-                    <td>2</td>
-                  </tr>
-                  <tr>
-                    <td>02/05/2018</td>
-                    <td>21</td>
-                    <td>1</td>
-                    <td>10</td>
+                  <tr
+                    v-for="(item, index) in steps"
+                    :key="'monitorstep' + index"
+                  >
+                    <td>
+                      <button
+                        v-b-modal.modal-lg
+                        @click="details(item.monitorStepId)"
+                        class="btn btn-primary"
+                      >
+                        <icon icon="search" />
+                      </button>
+                    </td>
+                    <td>{{ item.typeText }}</td>
+                    <td>
+                      <span :title="item.lastCheckDate">{{
+                        item.lastCheckDate | moment("from", "now")
+                      }}</span>
+                    </td>
+                    <td>
+                      <monitor-status
+                        :status="item.status"
+                        :title="item.statusText"
+                      />
+                    </td>
+                    <td>{{ item.interval }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -129,6 +93,51 @@
         </div>
       </div>
     </div>
+    <b-modal id="modal-lg" size="lg" title="Logs">
+      <div class="table-responsive">
+        <table class="table card-table" v-if="logs">
+          <thead>
+            <tr>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+              <th>Interval</th>
+              <th>Log</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(item, index) in logs.items"
+              :key="'monitorsteplog' + index"
+            >
+              <td>
+                <span :title="item.startDate">{{
+                  item.startDate | moment()
+                }}</span>
+              </td>
+              <td>
+                <span :title="item.endDate">{{ item.endDate | moment() }}</span>
+              </td>
+              <td>
+                <monitor-status
+                  :status="item.status"
+                  :title="item.statusText"
+                />
+              </td>
+              <td>{{ item.interval }}</td>
+              <td>{{ item.log }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <b-pagination
+          v-if="logs"
+          :total-rows="logs.itemCount"
+          v-model="logsCurrentPage"
+          :per-page="10"
+          size="lg"
+        ></b-pagination>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -139,14 +148,90 @@ export default {
   data() {
     return {
       id: null,
-      item: null
+      item: null,
+      steps: null,
+      logs: null,
+      logsCurrentPage: 1,
+      currentStepId: null
     };
   },
+  watch: {
+    async logsCurrentPage(newValue) {
+      this.logPageChanged(newValue);
+    }
+  },
   async mounted() {
-    var result = await service.get(this.$route.params.id);
+    const result = await service.get(this.$route.params.id);
     if (result.success) {
-      this.item = result.data;
-      console.log(item);
+      let item = result.data;
+      item.loadtimeChart = this.chart(
+        `${item.loadTime.toFixed(2)} ms`,
+        "Load Time",
+        item.loadTimes
+      );
+      item.uptimeChart = this.chart(
+        `${item.upTime.toFixed(2)} %`,
+        "Up Time",
+        item.upTimes
+      );
+      this.item = item;
+    }
+
+    const steps = await service.steps(this.$route.params.id);
+    console.log(steps);
+    this.steps = steps.data;
+  },
+  methods: {
+    async details(id) {
+      this.currentStepId = id;
+      await this.logPageChanged(1);
+    },
+    async logPageChanged(page) {
+      this.logs = null;
+      const result = await service.steplogs(this.currentStepId, page - 1);
+      this.logs = result.data;
+    },
+    chart(title, subtitle, data) {
+      return {
+        chart: {
+          type: "area",
+          height: 160,
+          sparkline: {
+            enabled: true
+          }
+        },
+        stroke: {
+          curve: "straight"
+        },
+        fill: {
+          opacity: 0.3
+        },
+        series: [
+          {
+            name: subtitle,
+            data: data
+          }
+        ],
+        yaxis: {
+          min: 0
+        },
+        colors: ["#00bfff"],
+        title: {
+          text: title,
+          style: {
+            fontSize: "16pt",
+            cssClass: "apexcharts-yaxis-title"
+          }
+        },
+        subtitle: {
+          text: subtitle,
+          offsetX: 0,
+          style: {
+            fontSize: "10px",
+            cssClass: "apexcharts-yaxis-title"
+          }
+        }
+      };
     }
   }
 };

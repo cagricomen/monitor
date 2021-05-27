@@ -16,6 +16,15 @@ namespace Baron.Web
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<BReturnError> Errors { get; set; }
     }
+    public class BReturnPagedData<T>
+    {
+        public List<T> Items { get; set; }
+        public int PageCount { get; set; }
+        public int ItemCount { get; set; }
+        public int CurrentPage { get; set; }
+    }
+
+
     public class BReturnError
     {
         public string Message { get; set; }

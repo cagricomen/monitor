@@ -96,8 +96,9 @@ namespace Baron.Web.Controllers
                 stepStatusText = $"{stepStatus}"
             };
         }
+
         [HttpGet("{id?}")]
-        public async Task<IActionResult> Get([FromRoute]Guid? id)
+        public async Task<IActionResult> Get([FromRoute] Guid? id)
         {
             if (id.HasValue)
             {
@@ -122,6 +123,7 @@ namespace Baron.Web.Controllers
 
             return Success(null, clientList);
         }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] BMMonitorSave value)
         {
@@ -189,6 +191,75 @@ namespace Baron.Web.Controllers
             else
                 return Error("Something wrong.");
         }
+
+        [HttpGet("steps/{id}")]
+        public async Task<IActionResult> Steps(Guid id)
+        {
+            var monitor = await Db.Monitors.FirstOrDefaultAsync(x => x.MonitorId == id && x.UserId == UserId);
+            if (monitor == null)
+                return Error("Monitor not found.");
+
+            var steps = await Db.MonitorSteps.Where(x => x.MonitorId == id).ToListAsync();
+
+            var list = steps.Select(x =>
+            new
+            {
+                x.MonitorStepId,
+                x.Interval,
+                x.Status,
+                StatusText = x.Status.ToString(),
+                x.LastCheckDate,
+                x.Type,
+                TypeText = x.Type.ToString()
+            }).ToList();
+
+            return Success(null, list);
+        }
+
+        [HttpGet("steplogs/{id}")]
+        public async Task<IActionResult> StepLogs(Guid id, [FromQuery] int page)
+        {
+            var step = await Db.MonitorSteps.FirstOrDefaultAsync(x => x.MonitorStepId == id);
+            if (step == null)
+                return Error("Monitor step not found.");
+
+            var monitor = await Db.Monitors.FirstOrDefaultAsync(x => x.MonitorId == step.MonitorId && x.UserId == UserId);
+
+            if (monitor == null)
+                return Error("Monitor not found.");
+
+            var itemCount = await Db.MonitorStepLogs.CountAsync(x => x.MonitorStepId == step.MonitorStepId);
+            var perPageItem = 10;
+            var currentPage = page;
+
+            var logs = await Db.MonitorStepLogs.Where(x => x.MonitorStepId == step.MonitorStepId)
+            .OrderByDescending(x => x.StartDate)
+            .Skip(currentPage * perPageItem)
+            .Take(perPageItem)
+            .ToListAsync();
+
+            var pagedResult = new BReturnPagedData<dynamic>();
+            pagedResult.ItemCount = itemCount;
+            pagedResult.PageCount = (int)Math.Ceiling( itemCount / (decimal)perPageItem);
+            pagedResult.CurrentPage = currentPage;
+            pagedResult.Items = new List<dynamic>();
+            foreach (var item in logs)
+            {
+                pagedResult.Items.Add(new
+                {
+                    item.MonitorStepLogId,
+                    item.Log,
+                    item.Interval,
+                    item.StartDate,
+                    item.EndDate,
+                    item.Status,
+                    StatusText = item.Status.ToString(),
+                });
+            }
+
+            return Success(null, pagedResult);
+        }
+
     }
     public class MonitoringModel
     {
